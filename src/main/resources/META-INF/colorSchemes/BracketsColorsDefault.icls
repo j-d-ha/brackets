@@ -1,0 +1,18 @@
+<?xml version='1.0'?>
+<list>
+    <option name="BRACKET_LEVEL_1">
+        <value>
+            <option name="FOREGROUND" value="FFD700"/>
+        </value>
+    </option>
+    <option name="BRACKET_LEVEL_2">
+        <value>
+            <option name="FOREGROUND" value="DA70D6"/>
+        </value>
+    </option>
+    <option name="BRACKET_LEVEL_3">
+        <value>
+            <option name="FOREGROUND" value="179fff"/>
+        </value>
+    </option>
+</list>

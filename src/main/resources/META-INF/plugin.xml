@@ -5,14 +5,25 @@
     <vendor>j-d-ha</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <!--    <depends>com.jetbrains.rider.fsharp</depends>-->
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.jdha.brackets.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
-    </extensions>
+        <additionalTextAttributes
+                scheme="Default"
+                file="META-INF/colorSchemes/BracketsColorsDefault.icls"/>
+        <additionalTextAttributes
+                scheme="Darcula"
+                file="META-INF/colorSchemes/BracketsColorsDefault.icls"/>
 
-    <applicationListeners>
-        <listener class="com.github.jdha.brackets.listeners.MyApplicationActivationListener" topic="com.intellij.openapi.application.ApplicationActivationListener"/>
-    </applicationListeners>
+        <colorSettingsPage implementation="com.github.jdha.brackets.settings.BracketSettings"/>
+
+        <annotator language="C#" implementationClass="com.github.jdha.brackets.annotator.CSBracketColorizer"
+                   id="CSBracketColorizer"/>
+
+        <annotator language="F#" implementationClass="com.github.jdha.brackets.annotator.FSBracketColorizer"
+                   id="FSBracketColorizer"/>
+
+    </extensions>
 </idea-plugin>
