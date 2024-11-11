@@ -7,7 +7,7 @@
 ## About The Project
 
 <!-- Plugin description -->
-`brackets` is a JetBrains Rider plugin to provide matching bracket pair colorization in your code,
+`brackets` is a JetBrains plugin to provide matching bracket pair colorization in your code,
 just like VSCode does. The plugin supports three levels of colorization with default values set to
 match VSCode.
 
@@ -59,3 +59,18 @@ the future, add additional features, fix bugs, etc. With that being said, if you
 please [create an issue](https://github.com/j-d-ha/brackets/issues/new). Also, if you would like to
 contribute to the project, you can do so by opening a pull request on GitHub.
 
+## Acknowledgements
+
+This project is based on the lite and open-source version of
+the [intellij-rainbow-brackets](https://github.com/izhangzhihao/intellij-rainbow-brackets) JetBrains
+plugin, originally authored by [Zhihao Zhang](https://github.com/izhangzhihao) and licensed under
+the GPL-3.0.
+
+This plugin is also inspired by the VSCode
+plugin [Bracket-Pair-Colorizer-2](https://github.com/CoenraadS/Bracket-Pair-Colorizer-2)
+by [CoenraadS](https://github.com/CoenraadS),
+which
+originally provided similar functionality to VSCode.
+
+Finally, this plugin is also based on
+the [IntelliJ Platform Plugin Template](https://github.com/JetBrains/intellij-platform-plugin-template).

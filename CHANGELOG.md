@@ -9,3 +9,6 @@
 ### Added
 
 - Initial release
+
+[Unreleased]: https://github.com/j-d-ha/brackets/compare/v0.0.1...HEAD
+[0.0.1]: https://github.com/j-d-ha/brackets/commits/v0.0.1
