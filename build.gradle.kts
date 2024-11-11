@@ -1,7 +1,17 @@
+import java.io.FileReader
+import java.util.Properties
 import org.gradle.kotlin.dsl.assign
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+
+// load .env file if it exists
+File(".env").takeIf(File::exists)?.let {
+    Properties().apply {
+        load(FileReader(it))
+        println(".env file found")
+    }
+}
 
 plugins {
     id("java") // Java support
@@ -112,25 +122,14 @@ intellijPlatform {
     }
 
     signing {
-        certificateChain.set(
-            File(System.getenv("CERTIFICATE_CHAIN") ?: "./certs/chain.crt").readText(Charsets.UTF_8)
-        )
-
-        privateKey.set(
-            File(System.getenv("PRIVATE_KEY") ?: "./certs/private.pem").readText(Charsets.UTF_8)
-        )
-
-        password.set(
-            File(System.getenv("PRIVATE_KEY_PASSWORD") ?: "./certs/password.txt")
-                .readText(Charsets.UTF_8)
-        )
+        password.set(providers.environmentVariable("PRIVATE_KEY_PASSWORD"))
+        certificateChain.set(providers.environmentVariable("CERTIFICATE_CHAIN"))
+        privateKey.set(providers.environmentVariable("PRIVATE_KEY"))
     }
 
     publishing {
-        token.set(
-            File(System.getenv("PUBLISH_TOKEN") ?: "./certs/publish_token.txt")
-                .readText(Charsets.UTF_8)
-        )
+        token.set(providers.environmentVariable("PUBLISH_TOKEN"))
+
         // The pluginVersion is based on the SemVer (https://semver.org) and supports pre-release
         // labels, like 2.1.7-alpha.3
         // Specify pre-release label to publish the plugin in a custom Release Channel
