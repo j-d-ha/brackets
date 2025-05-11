@@ -1,6 +1,5 @@
 import java.io.FileReader
 import java.util.Properties
-import org.gradle.kotlin.dsl.assign
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
@@ -15,8 +14,8 @@ File(".env").takeIf(File::exists)?.let {
 
 plugins {
     id("java") // Java support
-    alias(libs.plugins.kotlin) version "2.0.21" // Kotlin support
-    alias(libs.plugins.intelliJPlatform) version "2.1.0" // IntelliJ Platform Gradle Plugin
+    alias(libs.plugins.kotlin) version "2.1.20" // Kotlin support
+    alias(libs.plugins.intelliJPlatform) version "2.5.0" // IntelliJ Platform Gradle Plugin
     alias(libs.plugins.changelog) // Gradle Changelog Plugin
     alias(libs.plugins.qodana) // Gradle Qodana Plugin
     alias(libs.plugins.kover) // Gradle Kover Plugin
@@ -61,7 +60,6 @@ dependencies {
         // plugin from JetBrains Marketplace.
         plugins(providers.gradleProperty("platformPlugins").map { it.split(',') })
 
-        instrumentationTools()
         pluginVerifier()
         zipSigner()
         testFramework(TestFrameworkType.Platform)
