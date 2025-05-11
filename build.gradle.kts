@@ -14,8 +14,8 @@ File(".env").takeIf(File::exists)?.let {
 
 plugins {
     id("java") // Java support
-    alias(libs.plugins.kotlin) version "2.1.20" // Kotlin support
-    alias(libs.plugins.intelliJPlatform) version "2.5.0" // IntelliJ Platform Gradle Plugin
+    alias(libs.plugins.kotlin) // Kotlin support
+    alias(libs.plugins.intelliJPlatform) // IntelliJ Platform Gradle Plugin
     alias(libs.plugins.changelog) // Gradle Changelog Plugin
     alias(libs.plugins.qodana) // Gradle Qodana Plugin
     alias(libs.plugins.kover) // Gradle Kover Plugin
@@ -23,10 +23,10 @@ plugins {
 
 group = providers.gradleProperty("pluginGroup").get()
 
-version = project.changelog.getAll().keys.toList().first { Regex("""\d+\.\d+\.\d+""").matches(it) }
+version = providers.gradleProperty("pluginVersion").get()
 
 // Set the JVM language level used to build the project.
-kotlin { jvmToolchain(17) }
+kotlin { jvmToolchain(21) }
 
 // Configure project's dependencies
 repositories {
@@ -50,8 +50,6 @@ dependencies {
             providers.gradleProperty("platformVersion"),
         )
 
-        // local(file("/Users/jonasha/Applications/Rider.app/Contents"))
-
         // Plugin Dependencies. Uses `platformBundledPlugins` property from the gradle.properties
         // file for bundled IntelliJ Platform plugins.
         bundledPlugins(providers.gradleProperty("platformBundledPlugins").map { it.split(',') })
@@ -60,16 +58,7 @@ dependencies {
         // plugin from JetBrains Marketplace.
         plugins(providers.gradleProperty("platformPlugins").map { it.split(',') })
 
-        pluginVerifier()
-        zipSigner()
         testFramework(TestFrameworkType.Platform)
-    }
-}
-
-idea {
-    module {
-        isDownloadJavadoc = true
-        isDownloadSources = true
     }
 }
 
@@ -77,9 +66,8 @@ idea {
 // https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-extension.html
 intellijPlatform {
     pluginConfiguration {
-        val changelog = project.changelog // local variable for configuration cache compatibility
-
-        version = changelog.getAll().keys.toList().first { Regex("""\d+\.\d+\.\d+""").matches(it) }
+        name = providers.gradleProperty("pluginName")
+        version = providers.gradleProperty("pluginVersion")
 
         // Extract the <!-- Plugin description --> section from README.md and provide for the
         // plugin's manifest
@@ -100,6 +88,7 @@ intellijPlatform {
                 }
             }
 
+        val changelog = project.changelog // local variable for configuration cache compatibility
         // Get the latest available change notes from the changelog file
         changeNotes =
             providers.gradleProperty("pluginVersion").map { pluginVersion ->
@@ -120,14 +109,13 @@ intellijPlatform {
     }
 
     signing {
-        password.set(providers.environmentVariable("PRIVATE_KEY_PASSWORD"))
-        certificateChain.set(providers.environmentVariable("CERTIFICATE_CHAIN"))
-        privateKey.set(providers.environmentVariable("PRIVATE_KEY"))
+        certificateChain = providers.environmentVariable("CERTIFICATE_CHAIN")
+        privateKey = providers.environmentVariable("PRIVATE_KEY")
+        password = providers.environmentVariable("PRIVATE_KEY_PASSWORD")
     }
 
     publishing {
-        token.set(providers.environmentVariable("PUBLISH_TOKEN"))
-
+        token = providers.environmentVariable("PUBLISH_TOKEN")
         // The pluginVersion is based on the SemVer (https://semver.org) and supports pre-release
         // labels, like 2.1.7-alpha.3
         // Specify pre-release label to publish the plugin in a custom Release Channel

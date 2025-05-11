@@ -2,7 +2,7 @@
 
 # brackets Changelog
 
-## [0.0.2] - 2025-05-11
+## [Unreleased]
 
 ### Added
 
@@ -14,8 +14,6 @@
 ### Added
 
 - Initial release
-
-## [Unreleased]
 
 [Unreleased]: https://github.com/j-d-ha/brackets/compare/v0.0.1...HEAD
 
