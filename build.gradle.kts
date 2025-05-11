@@ -142,11 +142,16 @@ intellijPlatform {
     pluginVerification {
         ides {
             val productReleases = ProductReleasesValueSource().get()
-            println("productReleases: $productReleases")
+            println(
+                "The following builds are available in the verification range: $productReleases"
+            )
+
             val reducedProductReleases =
                 if (productReleases.size > 2)
                     listOf(productReleases.first(), productReleases.last())
                 else productReleases
+            println("Running pluginVerification for the following builds: $reducedProductReleases")
+
             ides(reducedProductReleases)
         }
     }
