@@ -10,11 +10,13 @@ class BracketsSettingsConfigurable : BoundConfigurable("Brackets") {
 
     override fun createPanel(): DialogPanel = panel {
         row {
-            checkBox("Disable Brackets for files with more than")
+            checkBox("Disable bracket pair colorization for files with more than")
                 .bindSelected(currentSettings::disableForLongFiles)
+                .gap(RightGap.SMALL)
 
             intTextField(range = IntRange(1, Int.MAX_VALUE), keyboardStep = 5)
                 .bindIntText(currentSettings::longFileLineCountThreshold)
+                .gap(RightGap.SMALL)
 
             label("lines")
         }
