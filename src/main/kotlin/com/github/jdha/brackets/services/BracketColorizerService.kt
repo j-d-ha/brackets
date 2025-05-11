@@ -1,29 +1,7 @@
-/*
- * brackets - JetBrains plugin to provide matching bracket pair colorization.
- * Copyright (C) 2017-2024 Zhihao Zhang and the intellij-rainbow-brackets contributors
- * Copyright (C) 2024 Jonas Ha
- *
- * The following code is a derivative work of the code from the lite open source
- * version of the intellij-rainbow-brackets project, which is licensed under the
- * GPL-3.0 license. This code therefore is also licensed under the terms of the
- * GPL-3.0 license. The repository for th intellij-rainbow-brackets project can be
- * found here: https://github.com/izhangzhihao/intellij-rainbow-brackets.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, version 3.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see https://www.gnu.org/licenses/.
- */
+package com.github.jdha.brackets.services
 
-package com.github.jdha.brackets.annotator
-
+import com.github.jdha.brackets.settings.BracketsSettingsState
+import com.github.jdha.brackets.util.getContainingFileLineCount
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.editor.colors.TextAttributesKey
@@ -45,7 +23,13 @@ import com.intellij.psi.impl.source.tree.LeafPsiElement
  * @property left the set of left brackets (e.g., `{`, `[`, `(`, `<`)
  * @property right the set of right brackets (e.g., `}`, `]`, `)`, `>`)
  */
-class BracketColorizer private constructor(val left: Set<String>, val right: Set<String>) {
+class BracketColorizerService private constructor(val left: Set<String>, val right: Set<String>) {
+
+    init {
+        println("BracketColorizerService init")
+    }
+
+    private val settings = BracketsSettingsState.Companion.getInstance()
 
     companion object {
         val left = setOf("[", "{", "(", "<")
@@ -56,7 +40,7 @@ class BracketColorizer private constructor(val left: Set<String>, val right: Set
          *
          * @return a `BracketColorizer` instance with default brackets
          */
-        fun default(): BracketColorizer = BracketColorizer(left, right)
+        fun default(): BracketColorizerService = BracketColorizerService(left, right)
 
         /**
          * Creates a `BracketColorizer` with additional custom brackets.
@@ -65,22 +49,15 @@ class BracketColorizer private constructor(val left: Set<String>, val right: Set
          * @param addRight a set of additional right brackets to include
          * @return a `BracketColorizer` instance with the extended bracket sets
          */
-        fun withAdditionalBrackets(addLeft: Set<String>, addRight: Set<String>): BracketColorizer =
-            BracketColorizer(left = left union addLeft, right = right union addRight)
-
-        /**
-         * Creates a `BracketColorizer` instance with custom bracket sets.
-         *
-         * @param left a set of left brackets to use for highlighting
-         * @param right a set of right brackets to use for highlighting
-         * @return a `BracketColorizer` instance with custom brackets
-         */
-        fun withCustomBrackets(left: Set<String>, right: Set<String>): BracketColorizer =
-            BracketColorizer(left, right)
+        fun withAdditionalBrackets(
+            addLeft: Set<String>,
+            addRight: Set<String>,
+        ): BracketColorizerService =
+            BracketColorizerService(left = left union addLeft, right = right union addRight)
     }
 
     private val colors =
-        mapOf<Int, TextAttributesKey>(
+        mapOf(
             1 to TextAttributesKey.createTextAttributesKey("BRACKET_LEVEL_1"),
             2 to TextAttributesKey.createTextAttributesKey("BRACKET_LEVEL_2"),
             3 to TextAttributesKey.createTextAttributesKey("BRACKET_LEVEL_3"),
@@ -90,25 +67,19 @@ class BracketColorizer private constructor(val left: Set<String>, val right: Set
     private val max = colors.size
 
     /**
-     * The current bracket nesting level, used to determine the appropriate color for highlighting.
-     * - The `level` increases when a left bracket (from the `left` set) is encountered.
-     * - The `level` decreases when a right bracket (from the `right` set) is encountered.
-     * - The value of `level` is kept within the range `[1, max]`, where `max` is the total number
-     *   of available colors.
-     * - If `level` exceeds `max`, it wraps around to `1`.
-     * - If `level` falls below `1`, it wraps around to `max`.
+     * Adjusts the bracket nesting level to ensure it stays within the valid range.
+     * - If level exceeds max, it wraps around to 1.
+     * - If level falls below 1, it wraps around to max.
+     * - Otherwise, returns the original value.
      *
-     * This ensures that the color-coding cycles through the available colors for deeply nested or
-     * unbalanced brackets.
+     * @param level The current level value to adjust
+     * @return The adjusted level value
      */
-    private var level = 1
-        set(value) {
-            field =
-                when {
-                    value > max -> 1
-                    value < 1 -> max
-                    else -> value
-                }
+    private fun adjustLevel(level: Int): Int =
+        when {
+            level > max -> 1
+            level < 1 -> max
+            else -> level
         }
 
     /**
@@ -123,6 +94,13 @@ class BracketColorizer private constructor(val left: Set<String>, val right: Set
      * @param holder the annotation holder to which color annotations are added
      */
     fun colorize(element: PsiElement, holder: AnnotationHolder) {
+        // early return if long file disable is enabled and if long file
+        if (
+            settings.disableForLongFiles &&
+                element.getContainingFileLineCount() > settings.longFileLineCountThreshold
+        )
+            return
+
         // Return early if the element is not a valid leaf PSI element or not a recognized bracket
         if (
             element !is LeafPsiElement ||
@@ -133,9 +111,9 @@ class BracketColorizer private constructor(val left: Set<String>, val right: Set
 
         // if element is a left bracket we want to set value to 3 (-1 if we did not wrap) or 1 if
         // it's a right bracket. This gives us out starting level to calculate from.
-        level = if (element.text in right) 3 else 1
+        var level = if (element.text in right) 3 else 1
 
-        parsePsiElement(element)
+        level = parsePsiElement(element, level)
 
         // get color as TextAttributesKey based on level. Note that due to how the setter wraps
         // values, we should ALWAYS be to get a color here.
@@ -168,13 +146,17 @@ class BracketColorizer private constructor(val left: Set<String>, val right: Set
      * given PsiElement. The count is used to determine the color of the given PsiElement.
      *
      * @param element the PsiElement to start parsing from
+     * @param level the current bracket nesting level
+     * @return the updated bracket nesting level
      */
-    private tailrec fun parsePsiElement(element: PsiElement) {
+    private tailrec fun parsePsiElement(element: PsiElement, level: Int): Int {
         // process and previous sibling if it exists
-        element.prevSibling?.let { parsePsiElementSiblings(it, element) }
+        val newLevel =
+            element.prevSibling?.let { parsePsiElementSiblings(it, element, level) } ?: level
 
         // Recursively process the parent if it exists
-        if (element.parent !is PsiFile) parsePsiElement(element.parent)
+        return if (element.parent !is PsiFile) parsePsiElement(element.parent, newLevel)
+        else newLevel
     }
 
     /**
@@ -184,21 +166,30 @@ class BracketColorizer private constructor(val left: Set<String>, val right: Set
      *
      * @param element the PsiElement to process
      * @param startElement the PsiElement that is being colored
+     * @param level the current bracket nesting level
+     * @return the updated bracket nesting level
      */
-    private tailrec fun parsePsiElementSiblings(element: PsiElement, startElement: PsiElement) {
+    private tailrec fun parsePsiElementSiblings(
+        element: PsiElement,
+        startElement: PsiElement,
+        level: Int,
+    ): Int {
         // Process the current element if it is a valid leaf PSI element
+        var newLevel = level
         (element as? LeafPsiElement)
             ?.takeIf { !filterAngleBrackets(it) }
             ?.text
             ?.let { text ->
-                when (text) {
-                    in left -> level++
-                    in right -> level--
-                }
+                newLevel =
+                    when (text) {
+                        in left -> adjustLevel(level + 1)
+                        in right -> adjustLevel(level - 1)
+                        else -> level
+                    }
             }
 
         // Recursively process the previous sibling if it exists
-        val nextSibling = element.prevSibling ?: return
-        parsePsiElementSiblings(nextSibling, startElement)
+        val nextSibling = element.prevSibling ?: return newLevel
+        return parsePsiElementSiblings(nextSibling, startElement, newLevel)
     }
 }

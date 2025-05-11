@@ -22,8 +22,19 @@
     <vendor>j-d-ha</vendor>
 
     <depends>com.intellij.modules.platform</depends>
-    
+
     <extensions defaultExtensionNs="com.intellij">
+        <applicationService
+                serviceImplementation="com.github.jdha.brackets.settings.BracketsSettingsState"
+        />
+
+        <applicationConfigurable
+                parentId="tools"
+                instance="com.github.jdha.brackets.settings.BracketsSettingsConfigurable"
+                id="com.github.jdha.brackets.settings.BracketsSettingsConfigurable"
+                displayName="Brackets"
+        />
+
         <additionalTextAttributes
                 scheme="Default"
                 file="META-INF/colorSchemes/BracketsColorsDefault.icls"/>
@@ -31,12 +42,12 @@
                 scheme="Darcula"
                 file="META-INF/colorSchemes/BracketsColorsDefault.icls"/>
 
-        <colorSettingsPage implementation="com.github.jdha.brackets.settings.BracketSettings"/>
+        <colorSettingsPage implementation="com.github.jdha.brackets.settings.BracketsColorSettings"/>
 
-        <annotator language="C#" implementationClass="com.github.jdha.brackets.annotator.CSBracketColorizer"
+        <annotator language="C#" implementationClass="com.github.jdha.brackets.annotator.CSBracketColorizerAnnotator"
                    id="CSBracketColorizer"/>
 
-        <annotator language="F#" implementationClass="com.github.jdha.brackets.annotator.FSBracketColorizer"
+        <annotator language="F#" implementationClass="com.github.jdha.brackets.annotator.FSBracketColorizerAnnotator"
                    id="FSBracketColorizer"/>
 
     </extensions>

@@ -18,6 +18,17 @@ match VSCode.
 
 > Note: As of now, I don't plan on adding support for any other languages.
 
+## Settings
+
+Plugin settings can be found in <kbd>Settings/Preferences</kbd> > <kbd>Tools</kbd> > <kbd>
+Brackets</kbd>.
+
+Bellow is a list available settings:
+
+- Matching bracket pair colorization can be disabled for large files. This functionality and the
+  line
+  count threshold for large files can be updated in settings.
+
 <!-- Plugin description end -->
 
 ## Installation

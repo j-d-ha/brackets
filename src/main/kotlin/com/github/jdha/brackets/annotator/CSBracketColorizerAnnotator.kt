@@ -17,13 +17,14 @@
 
 package com.github.jdha.brackets.annotator
 
+import com.github.jdha.brackets.services.BracketColorizerServiceFactory
+import com.github.jdha.brackets.services.BracketColorizerType
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
+import com.intellij.openapi.components.service
 import com.intellij.psi.PsiElement
 
-class FSBracketColorizer : Annotator {
-
-    private val colorizer = BracketColorizer.withAdditionalBrackets(setOf("[<"), setOf(">]"))
+class CSBracketColorizerAnnotator : Annotator {
 
     /**
      * This function is called by the plugin to annotate a given element of the PSI structure.
@@ -31,7 +32,6 @@ class FSBracketColorizer : Annotator {
      * @param p0 the element to annotate
      * @param p1 the annotation holder to which color annotations are added
      */
-    override fun annotate(p0: PsiElement, p1: AnnotationHolder) {
-        colorizer.colorize(p0, p1)
-    }
+    override fun annotate(p0: PsiElement, p1: AnnotationHolder) =
+        service<BracketColorizerServiceFactory>().get(BracketColorizerType.CSharp).colorize(p0, p1)
 }
