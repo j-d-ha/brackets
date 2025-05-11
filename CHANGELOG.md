@@ -7,6 +7,7 @@
 ### Added
 
 - Added an option to disable the plugin for large files.
+- Added service optimizations for performance gains.
 
 ## [0.0.1] - 2024-11-09
 
