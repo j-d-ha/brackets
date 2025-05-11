@@ -27,7 +27,7 @@ import com.intellij.openapi.util.NlsContexts
 import javax.swing.Icon
 import org.jetbrains.annotations.NonNls
 
-class BracketSettings : ColorSettingsPage {
+class BracketsColorSettings : ColorSettingsPage {
     override fun getIcon(): Icon? = null
 
     override fun getHighlighter(): SyntaxHighlighter =
