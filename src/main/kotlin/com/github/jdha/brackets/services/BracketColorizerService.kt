@@ -54,16 +54,6 @@ class BracketColorizerService private constructor(val left: Set<String>, val rig
             addRight: Set<String>,
         ): BracketColorizerService =
             BracketColorizerService(left = left union addLeft, right = right union addRight)
-
-        /**
-         * Creates a `BracketColorizer` instance with custom bracket sets.
-         *
-         * @param left a set of left brackets to use for highlighting
-         * @param right a set of right brackets to use for highlighting
-         * @return a `BracketColorizer` instance with custom brackets
-         */
-        fun withCustomBrackets(left: Set<String>, right: Set<String>): BracketColorizerService =
-            BracketColorizerService(left, right)
     }
 
     private val colors =

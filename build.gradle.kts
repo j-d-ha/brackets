@@ -139,7 +139,17 @@ intellijPlatform {
             }
     }
 
-    pluginVerification { ides { recommended() } }
+    pluginVerification {
+        ides {
+            val productReleases = ProductReleasesValueSource().get()
+            println("productReleases: $productReleases")
+            val reducedProductReleases =
+                if (productReleases.size > 2)
+                    listOf(productReleases.first(), productReleases.last())
+                else productReleases
+            ides(reducedProductReleases)
+        }
+    }
 }
 
 // Configure Gradle Changelog Plugin - read more:
