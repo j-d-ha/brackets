@@ -6,6 +6,10 @@
 
 ### Added
 
+- Updated to require restart after installation.
+
+### Added
+
 - Added an option to disable the plugin for large files.
 - Added service optimizations for performance gains.
 
