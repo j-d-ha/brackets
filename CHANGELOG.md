@@ -8,6 +8,8 @@
 
 - Updated to require restart after installation.
 
+## [0.0.2] - 2025-05-11
+
 ### Added
 
 - Added an option to disable the plugin for large files.
