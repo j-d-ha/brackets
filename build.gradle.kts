@@ -3,15 +3,9 @@ import java.util.Properties
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
-import org.jetbrains.intellij.platform.gradle.models.ProductRelease.Channel
 
 // load .env file if it exists
-File(".env").takeIf(File::exists)?.let {
-    Properties().apply {
-        load(FileReader(it))
-        println(".env file found")
-    }
-}
+File(".env").takeIf(File::exists)?.let { Properties().apply { load(FileReader(it)) } }
 
 plugins {
     id("java") // Java support
@@ -46,10 +40,12 @@ dependencies {
     // IntelliJ Platform Gradle Plugin Dependencies Extension - read more:
     // https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-dependencies-extension.html
     intellijPlatform {
-        create(
+        this.create(
             providers.gradleProperty("platformType"),
             providers.gradleProperty("platformVersion"),
-        )
+        ) {
+            useInstaller = false
+        }
 
         // Plugin Dependencies. Uses `platformBundledPlugins` property from the gradle.properties
         // file for bundled IntelliJ Platform plugins.
@@ -128,18 +124,7 @@ intellijPlatform {
             }
     }
 
-    pluginVerification {
-        ides {
-            recommended()
-            val productReleases =
-                ProductReleasesValueSource { channels = listOf(Channel.RELEASE) }.get()
-            val reducedProductReleases =
-                if (productReleases.size > 2)
-                    listOf(productReleases.first(), productReleases.last())
-                else productReleases
-            ides(reducedProductReleases)
-        }
-    }
+    pluginVerification { ides { recommended() } }
 }
 
 // Configure Gradle Changelog Plugin - read more:
