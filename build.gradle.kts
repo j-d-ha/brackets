@@ -1,8 +1,8 @@
-import java.io.FileReader
-import java.util.Properties
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import java.io.FileReader
+import java.util.*
 
 // load .env file if it exists
 File(".env").takeIf(File::exists)?.let {
@@ -127,16 +127,7 @@ intellijPlatform {
             }
     }
 
-    pluginVerification {
-        ides {
-            val productReleases = ProductReleasesValueSource().get()
-            val reducedProductReleases =
-                if (productReleases.size > 2)
-                    listOf(productReleases.first(), productReleases.last())
-                else productReleases
-            ides(reducedProductReleases)
-        }
-    }
+    pluginVerification { ides { recommended() } }
 }
 
 // Configure Gradle Changelog Plugin - read more:
