@@ -1,15 +1,50 @@
 # Dependabot configuration:
 # https://docs.github.com/en/free-pro-team@latest/github/administering-a-repository/configuration-options-for-dependency-updates
-
 version: 2
 updates:
   # Maintain dependencies for Gradle dependencies
   - package-ecosystem: "gradle"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "monday"
+      time: "07:00"
+      timezone: "America/New_York"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "gradle"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      gradle-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
+      gradle-major:
+        update-types:
+          - "major"
+    
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "monday"
+      time: "07:30"
+      timezone: "America/New_York"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci"
+    groups:
+      github-actions-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
+      github-actions-major:
+        update-types:
+          - "major"
